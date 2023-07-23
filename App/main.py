@@ -11,6 +11,12 @@ existing_db = pd.read_csv("./foods.csv")
 @app.route("/", methods = ("GET", "POST"))
 def home():
     existing_db = pd.read_csv("./foods.csv")
+    show_for_test = "Nothing"
+    if session.get("to_remove") is not None:
+        show_for_test = session["to_remove"]
+        existing_db = existing_db.drop(index=session["to_remove"])
+        existing_db.to_csv("./foods.csv", index=False)
+
     if request.method == "POST":
         loc = request.form["pantryFridgeFreezer"]
         name = request.form["foodName"]
@@ -20,9 +26,14 @@ def home():
                                                              "quantity":[quantity], "shelf_life": [7], "date_stored":[dt.datetime.date(dt.datetime.now())]})))
         existing_db.to_csv("./foods.csv", index=False)
 
-    return render_template("home.html", pantry=existing_db[existing_db.location=="Pantry"].to_html(),
-                           freezer=existing_db[existing_db.location=="Freezer"].to_html(),
+    return render_template("home.html", pantry=existing_db[existing_db.location=="Pantry"],
+                           freezer=show_for_test,
                            fridge=existing_db[existing_db.location=="Fridge"].to_html()
     )
-
+@app.route("/remove", methods=["POST"])
+def remove():
+    content = request.json
+    session["to_remove"] = content["name"]
+    print(session["to_remove"])
+    return "OK"
 app.run()

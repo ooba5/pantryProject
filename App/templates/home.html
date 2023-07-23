@@ -34,7 +34,22 @@
 
 <div>
   <h2>pantry</h2>
-  {{pantry | safe}}
+  <script>
+    var foodVar = 0;
+  </script>
+  {% for food in pantry.iterrows() %}
+  <div class ="row-sm-4">
+    <div class = "col-sm-4">
+
+      <p>{{food[1]}}</p>
+
+      <button type="button" class="btn btn-primary" id="{{food[1]['name']}}" onclick="Remove({{food[0]}})">remove</button>
+    </div>
+
+  </div>
+  {% endfor %}
+
+
   <h2>fridge</h2>
   {{fridge | safe}}
   <h2>freezer</h2>
@@ -47,15 +62,22 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
 <script>
-     async function ExecPythonCommand(){
-        const resp = await fetch("http://127.0.0.1:5000/home" , {
+     async function Remove(val){
+        const resp = await fetch("http://127.0.0.1:5000/remove" , {
           method: "POST",
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
-          }
+          },
 
+          body: JSON.stringify({
+            name: val,
+
+          })
         })
+        if(resp.ok){
+            window.location = window.location.href
+        }
      }
 
      function refresh(){
