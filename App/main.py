@@ -10,13 +10,14 @@ app.secret_key = Config.secret
 existing_db = pd.read_csv("./foods.csv")
 @app.route("/", methods = ("GET", "POST"))
 def home():
+
     existing_db = pd.read_csv("./foods.csv")
     show_for_test = "Nothing"
     if session.get("to_remove") is not None:
         show_for_test = session["to_remove"]
         existing_db = existing_db.drop(index=session["to_remove"])
         existing_db.to_csv("./foods.csv", index=False)
-
+        session["to_remove"] = None
     if request.method == "POST":
         loc = request.form["pantryFridgeFreezer"]
         name = request.form["foodName"]
