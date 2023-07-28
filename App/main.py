@@ -8,16 +8,23 @@ from utils import Food, Meal
 app = Flask('__main__')
 app.secret_key = Config.secret
 existing_db = pd.read_csv("./foods.csv")
-@app.route("/", methods = ("GET", "POST"))
+
+@app.route("/")
+def start():
+    session["to_remove"] = None
+    return redirect(url_for("home"))
+@app.route("/home", methods = ("GET", "POST"))
 def home():
 
     existing_db = pd.read_csv("./foods.csv")
     show_for_test = "Nothing"
+    print(session["to_remove"])
     if session.get("to_remove") is not None:
         show_for_test = session["to_remove"]
-        existing_db = existing_db.drop(index=session["to_remove"])
-        existing_db.to_csv("./foods.csv", index=False)
-        session["to_remove"] = None
+        if len(existing_db) > 0:
+            existing_db = existing_db.drop(index=session["to_remove"])
+            existing_db.to_csv("./foods.csv", index=False)
+            session["to_remove"] = None
     if request.method == "POST":
         loc = request.form["pantryFridgeFreezer"]
         name = request.form["foodName"]
